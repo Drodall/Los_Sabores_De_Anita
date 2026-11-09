@@ -328,4 +328,16 @@
     iniciarRevelado();
     iniciarBotonArriba();
     iniciarFormulario();
+
+    /* ============================================================
+       PWA: registro del service worker
+       (los navegadores solo lo permiten en http/https, no en file://)
+       ============================================================ */
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('sw.js').catch(function () {
+                /* Sin service worker el sitio sigue funcionando con normalidad. */
+            });
+        });
+    }
 })();

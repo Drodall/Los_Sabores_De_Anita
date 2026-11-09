@@ -51,6 +51,23 @@ img {
     display: block;
 }
 
+/* ---------- Fondo con imagen (solo escritorio) ----------
+   El gradiente va PRIMERO: en background-image la primera capa se pinta
+   arriba de la segunda y hace de velo para que el texto siga legible.
+   Si el archivo todavía no existe, se ve el --fondo de siempre. */
+@media (min-width: 901px) {
+    body {
+        background-color: var(--fondo);
+        background-image:
+            linear-gradient(rgba(253, 246, 233, 0.9), rgba(253, 246, 233, 0.9)),
+            url('../imagen de background.png');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+}
+
 h1,
 h2,
 h3,
@@ -242,11 +259,15 @@ section h2::after {
 /* ============================================================
    MENÚ
    ============================================================ */
+/* Dos columnas fijas: cada grupo de platos tiene 2 tarjetas, así no queda
+   una columna vacía a la derecha y el bloque queda centrado en la página. */
 #menu > div {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 28px;
     align-items: start;
+    max-width: 800px;
+    margin-inline: auto;
 }
 
 /* Los <div> sin clase que agrupan platos se "disuelven" para que
@@ -327,11 +348,15 @@ section h2::after {
     color: var(--texto);
 }
 
+/* object-fit: contain muestra el plato completo (sin recortes) y
+   object-position: center lo deja centrado dentro de su marco. */
 .plato img {
     width: 100%;
     height: 200px;
     margin-top: auto;
-    object-fit: cover;
+    object-fit: contain;
+    object-position: center;
+    background: var(--crema);
     border-radius: 12px;
     transition: transform 0.45s ease;
 }
@@ -682,7 +707,7 @@ header .nav-links a.activo {
    ============================================================ */
 @media (max-width: 900px) {
     #menu > div {
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 22px;
     }
 
     .plato img {
