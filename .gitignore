@@ -1,2 +1,6 @@
+node_modules/
+
+# Variables de entorno y credenciales locales (nunca subir a Git)
 .env
-.opencode/
+.env.*
+!.env.example

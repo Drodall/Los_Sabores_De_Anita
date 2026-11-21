@@ -28,7 +28,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+    <link href="css/tailwind.css" rel="stylesheet">
+    <script src="js/auth.js" defer></script>
     <script src="js/main.js" defer></script>
     <title>Las Sazones de Anita | Comida colombiana y chilena</title>
 </head>
@@ -44,8 +45,23 @@
                 <li><a href="#inicio">Inicio</a></li>
                 <li><a href="#menu">Menú</a></li>
                 <li><a href="#contactenos">Contáctenos</a></li>
+                <li id="zona-sesion" class="zona-sesion"><a href="login.html">Ingresar</a></li>
             </ul>
         </nav>
+
+        <div class="header-acciones">
+            <button type="button" id="abrir-carrito" class="btn-carrito" aria-expanded="false"
+                aria-controls="carrito-panel">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                    <path fill="currentColor"
+                        d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM5.2 4l.9 4.6 1.1 5.1c.1.5.5.8 1 .8h8.9c.5 0 .9-.3 1-.8l1.6-7.1H7.1L6.7 4H3v2h2.2ZM8 6h10.2l-1.3 6H8.6L8 6Z" />
+                </svg>
+                <span>Mi pedido</span>
+                <span id="carrito-contador" class="carrito-badge" hidden>0</span>
+            </button>
+        </div>
+
+        <p id="carrito-aviso" class="sr-only" role="status" aria-live="polite"></p>
     </header>
 
     <main>
@@ -63,72 +79,80 @@
             <div>
                 <h3>Entradas colombianas</h3>
 
-                <article class="plato">
+                <article class="plato" data-id="papas-rellenas" data-nombre="Papas rellenas" data-precio="1500">
                     <h4>Papas rellenas <span class="plato-precio">$CLP1500</span></h4>
                     <p>Papa con buena masa por fuera; por dentro trae arroz, carne desmechada y un huevo.</p>
                     <img src="Imagen de papa rellena.png" alt="Papas rellenas colombianas" width="350" height="250"
                         loading="lazy" decoding="async">
+                    <button type="button" class="btn-agregar" data-agregar>Agregar al pedido</button>
                 </article>
 
-                <article class="plato">
+                <article class="plato" data-id="platano-aborrajado" data-nombre="Plátano aborrajado" data-precio="2500">
                     <h4>Plátano aborrajado <span class="plato-precio">$CLP2500</span></h4>
                     <p>Plátano maduro relleno de queso derretido.</p>
                     <img src="Platano Aborrajado.png" alt="Plátano aborrajado relleno de queso" width="350" height="250"
                         loading="lazy" decoding="async">
+                    <button type="button" class="btn-agregar" data-agregar>Agregar al pedido</button>
                 </article>
 
                 <div>
                     <h3>Platos fuertes colombianos</h3>
-                    <article class="plato">
+                    <article class="plato" data-id="bandeja-paisa" data-nombre="Bandeja paisa" data-precio="6500">
                         <h4>Bandeja paisa <span class="plato-precio">$CLP6500</span></h4>
                         <p>Frijoles, arroz, carne molida, chicharrón, huevo frito, plátano maduro, arepa y aguacate.</p>
                         <img src="Bandeja paisa.png" alt="Bandeja paisa colombiana" width="350" height="250"
                             loading="lazy" decoding="async">
+                        <button type="button" class="btn-agregar" data-agregar>Agregar al pedido</button>
                     </article>
                 </div>
 
-                <article class="plato">
+                <article class="plato" data-id="sancocho-gallina" data-nombre="Sancocho de gallina" data-precio="5500">
                     <h4>Sancocho de gallina <span class="plato-precio">$CLP5500</span></h4>
                     <p>Caldo espeso y reconfortante que se cocina a base de gallina criolla combinada con diversos
                         tubérculos, plátano y maíz.</p>
                     <img src="Sancocho de gallina.png" alt="Sancocho de gallina colombiano" width="350" height="250"
                         loading="lazy" decoding="async">
+                    <button type="button" class="btn-agregar" data-agregar>Agregar al pedido</button>
                 </article>
 
                 <div>
                     <h3>Entradas chilenas</h3>
-                    <article class="plato">
+                    <article class="plato" data-id="empanadas-pino" data-nombre="Empanadas de pino" data-precio="1500">
                         <h4>Empanadas de pino <span class="plato-precio">$CLP1500</span></h4>
                         <p>Masa horneada rellena de carne picada, cebolla, aceituna y huevo duro.</p>
                         <img src="Empanadas de pino.png" alt="Empanadas de pino chilenas" width="350" height="250"
                             loading="lazy" decoding="async">
+                        <button type="button" class="btn-agregar" data-agregar>Agregar al pedido</button>
                     </article>
 
-                    <article class="plato">
+                    <article class="plato" data-id="chorrillana" data-nombre="Chorrillana" data-precio="4750">
                         <h4>Chorrillana <span class="plato-precio">$CLP4750</span></h4>
                         <p>Papas fritas coronadas con longaniza, carne en tiras, cebolla salteada y huevos fritos.</p>
                         <img src="Chorrillana.png" alt="Chorrillana chilena" width="350" height="250" loading="lazy"
                             decoding="async">
+                        <button type="button" class="btn-agregar" data-agregar>Agregar al pedido</button>
                     </article>
                 </div>
 
                 <div>
                     <h3>Platos fuertes chilenos</h3>
-                    <article class="plato">
+                    <article class="plato" data-id="pastel-choclo" data-nombre="Pastel de choclo" data-precio="5500">
                         <h4>Pastel de choclo <span class="plato-precio">$CLP5500</span></h4>
                         <p>Plato típico chileno que consiste en una capa de pino (carne molida con cebolla, huevo duro,
                             aceitunas y pasas) cubierta con una capa de puré de maíz dulce y horneada hasta dorar.</p>
                         <img src="Pastel de choclo.png" alt="Pastel de choclo chileno" width="350" height="250"
                             loading="lazy" decoding="async">
+                        <button type="button" class="btn-agregar" data-agregar>Agregar al pedido</button>
                     </article>
                 </div>
 
-                <article class="plato">
+                <article class="plato" data-id="carbonada" data-nombre="Carbonada" data-precio="6500">
                     <h4>Carbonada <span class="plato-precio">$CLP6500</span></h4>
                     <p>Guiso tradicional chileno que combina carne de res, papas, zapallo, choclo, zanahorias y otras
                         verduras en un caldo sabroso y aromático.</p>
                     <img src="Carbonada.png" alt="Carbonada chilena" width="350" height="250" loading="lazy"
                         decoding="async">
+                    <button type="button" class="btn-agregar" data-agregar>Agregar al pedido</button>
                 </article>
             </div>
         </section>
@@ -222,6 +246,41 @@
             <p>&copy; 2026 Las Sazones de Anita. Todos los derechos reservados.</p>
         </div>
     </footer>
+
+    <!-- Carrito de pedidos (se muestra con js/main.js) -->
+    <div id="carrito-overlay" class="fixed inset-0 z-40 hidden bg-ink/50 backdrop-blur-sm"></div>
+
+    <div id="carrito-panel" role="dialog" aria-modal="true" aria-labelledby="carrito-titulo" aria-hidden="true"
+        class="fixed inset-y-0 right-0 z-50 hidden w-full max-w-md flex-col bg-paper text-ink shadow-2xl">
+        <div class="flex items-center justify-between border-b border-cream px-6 py-5">
+            <h2 id="carrito-titulo" class="m-0 text-xl font-bold text-brand">Tu pedido</h2>
+            <button type="button" data-cerrar-carrito
+                class="flex h-10 w-10 items-center justify-center rounded-full border border-cream text-xl leading-none text-ink transition hover:bg-cream"
+                aria-label="Cerrar el pedido">&times;</button>
+        </div>
+
+        <div id="carrito-items" class="flex-1 overflow-y-auto px-6"></div>
+
+        <div class="border-t border-cream px-6 py-5">
+            <div class="mb-4 flex items-baseline justify-between">
+                <span class="text-sm font-semibold uppercase tracking-wide text-ink/70">Total</span>
+                <span id="carrito-total" class="text-2xl font-bold text-brand">$CLP0</span>
+            </div>
+
+            <button type="button" id="carrito-checkout" disabled
+                class="w-full rounded-full bg-olive px-4 py-3 text-sm font-bold text-white transition hover:bg-olive/90 disabled:cursor-not-allowed disabled:opacity-50">
+                Pedir por WhatsApp
+            </button>
+
+            <button type="button" id="carrito-vaciar" disabled
+                class="mt-2 w-full rounded-full border border-cream px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-cream disabled:cursor-not-allowed disabled:opacity-50">
+                Vaciar pedido
+            </button>
+
+            <p id="carrito-mensaje" role="status" aria-live="polite"
+                class="mt-3 min-h-5 text-center text-sm font-semibold text-brand data-[tipo=ok]:text-olive"></p>
+        </div>
+    </div>
 
     <button type="button" class="volver-arriba" id="volver-arriba" aria-label="Volver arriba" hidden>&#8593;</button>
 </body>

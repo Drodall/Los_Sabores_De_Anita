@@ -1,0 +1,36 @@
+/*
+ * Tailwind CSS entry point.
+ *
+ * Preflight is intentionally omitted: the site already ships its own reset
+ * and base styles in css/style.css. The existing stylesheet is imported into
+ * the `base` layer so Tailwind utilities (in the `utilities` layer) can
+ * override it without fighting specificity.
+ *
+ * Run `npm run build:css` after editing this file or css/style.css.
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "../../css/style.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+/* Brand tokens exposed as Tailwind utilities (bg-brand, text-ink, ...). */
+@theme {
+    --color-brand: #b5542d;
+    --color-brand-dark: #94401f;
+    --color-ink: #4a2e1f;
+    --color-cream: #f3e7cf;
+    --color-paper: #fffaf0;
+    --color-olive: #6b7a3a;
+    --color-mustard: #d9a441;
+}
+
+@source "../../index.html";
+@source "../../login.html";
+@source "../../src/js";
+
+@layer components {
+    .btn-agregar {
+        @apply mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand;
+    }
+}

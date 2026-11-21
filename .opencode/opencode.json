@@ -1,0 +1,17 @@
+{
+  "agents": [
+    {
+      "name": "ChefFrontend",
+      "description": "Especialista en UI/UX del restaurante.",
+      "model": "Big Pickle",
+      "temperature": 0.2,
+      "system_prompt": "Eres el experto en frontend para 'Los Sabores de Anita'. Usa siempre la paleta de colores de la marca.",
+      "permissions": {
+        "allowed_tools": ["read_file", "write_file", "search_workspace"],
+        "denied_tools": ["execute_command"],
+        "allowed_paths": ["src/frontend/*", "public/assets/*", "index.html"],
+        "denied_paths": ["src/backend/db/*", ".env", ".opencode/*"]
+      }
+    }
+  ]
+}

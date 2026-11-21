@@ -191,6 +191,90 @@ header .nav-links a:focus-visible {
     box-shadow: 0 8px 18px rgba(181, 84, 45, 0.28);
 }
 
+/* Zona de sesión dentro de la navegación */
+header .nav-links .zona-sesion {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+header .nav-links .nav-greeting {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--chocolate);
+}
+
+header .nav-links button {
+    padding: 10px 20px;
+    font: inherit;
+    font-weight: 600;
+    color: var(--chocolate);
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(181, 84, 45, 0.18);
+    border-radius: 999px;
+    cursor: pointer;
+    transition:
+        background var(--transicion),
+        color var(--transicion);
+}
+
+header .nav-links button:hover,
+header .nav-links button:focus-visible {
+    background: var(--terracota);
+    color: #fff;
+}
+
+/* Acciones del header: abrir carrito */
+.header-acciones {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+}
+
+.btn-carrito {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--terracota);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(181, 84, 45, 0.3);
+    transition:
+        background var(--transicion),
+        transform var(--transicion);
+}
+
+.btn-carrito:hover,
+.btn-carrito:focus-visible {
+    background: var(--terracota-oscuro);
+    transform: translateY(-2px);
+}
+
+.carrito-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--terracota);
+    background: var(--crema);
+    border-radius: 999px;
+}
+
+/* Evita el scroll del fondo mientras el carrito está abierto. */
+body.carrito-abierto {
+    overflow: hidden;
+}
+
 /* ============================================================
    CONTENIDO PRINCIPAL
    ============================================================ */

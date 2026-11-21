@@ -1,0 +1,19 @@
+{
+  "name": "los-sabores-de-anita",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static PWA for Las Sazones de Anita, built with Tailwind CSS and TypeScript.",
+  "scripts": {
+    "build": "npm run build:js && npm run build:css",
+    "build:js": "tsc -p tsconfig.json",
+    "build:css": "tailwindcss -i ./src/styles/input.css -o ./css/tailwind.css --minify",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "watch:js": "tsc -p tsconfig.json --watch",
+    "watch:css": "tailwindcss -i ./src/styles/input.css -o ./css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.5",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^7.0.2"
+  }
+}

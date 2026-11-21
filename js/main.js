@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Las Sazones de Anita — interacciones del sitio.
  *
@@ -6,84 +7,89 @@
  * - Los datos del formulario se limpian y se codifican antes de usarse.
  * - El envío se limita por tiempo para frenar abuso (protección básica;
  *   la protección real contra fuerza bruta debe hacerse en el servidor).
+ *
+ * Compilar con `npm run build:js` (genera js/main.js).
  */
-(function () {
+(() => {
     'use strict';
-
-    var WHATSAPP_NUMERO = '56942723764';
-    var CLAVE_ENVIOS = 'lsa_envios';
-    var INTERVALO_MS = 30 * 1000;          // 30 s entre mensajes
-    var VENTANA_MS = 10 * 60 * 1000;       // ventana de 10 minutos
-    var MAX_ENVIOS = 5;                    // máximo 5 mensajes por ventana
-    var LIMITE_NOMBRE = 60;
-    var LIMITE_MENSAJE = 500;
-
-    var reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
+    const WHATSAPP_NUMERO = '56942723764';
+    const CLAVE_ENVIOS = 'lsa_envios';
+    const INTERVALO_MS = 30 * 1000; // 30 s entre mensajes
+    const VENTANA_MS = 10 * 60 * 1000; // ventana de 10 minutos
+    const MAX_ENVIOS = 5; // máximo 5 mensajes por ventana
+    const LIMITE_NOMBRE = 60;
+    const LIMITE_MENSAJE = 500;
+    const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     /* Almacenamiento seguro: localStorage puede fallar en modo privado. */
-    var almacen = {
-        get: function (clave) {
-            try { return window.localStorage.getItem(clave); } catch (e) { return null; }
+    const almacen = {
+        get(clave) {
+            try {
+                return window.localStorage.getItem(clave);
+            }
+            catch {
+                return null;
+            }
         },
-        set: function (clave, valor) {
-            try { window.localStorage.setItem(clave, valor); } catch (e) { /* sin persistencia */ }
+        set(clave, valor) {
+            try {
+                window.localStorage.setItem(clave, valor);
+            }
+            catch {
+                /* sin persistencia */
+            }
         }
     };
-
-    function $(selector, contexto) {
-        return (contexto || document).querySelector(selector);
+    function $(selector, contexto = document) {
+        return contexto.querySelector(selector);
     }
-
-    function $$(selector, contexto) {
-        return Array.prototype.slice.call((contexto || document).querySelectorAll(selector));
+    function $$(selector, contexto = document) {
+        return Array.from(contexto.querySelectorAll(selector));
     }
-
     /* Limpia texto: quita etiquetas y normaliza espacios. */
     function normalizar(valor) {
-        return String(valor || '')
+        return String(valor ?? '')
             .replace(/[<>]/g, '')
             .replace(/\s+/g, ' ')
             .trim();
     }
-
-    /* ============================================================
-       1. Enlace de navegación activo según la sección visible
-       ============================================================ */
     function iniciarNavegacionActiva() {
-        var enlaces = $$('header .nav-links a[href^="#"]');
-        var pares = enlaces
-            .map(function (enlace) {
-                var destino = document.getElementById(enlace.getAttribute('href').slice(1));
-                return destino ? { enlace: enlace, seccion: destino } : null;
-            })
-            .filter(Boolean);
-
-        if (!pares.length || !('IntersectionObserver' in window)) {
+        const enlaces = $$('header .nav-links a[href^="#"]');
+        const pares = [];
+        for (const enlace of enlaces) {
+            const href = enlace.getAttribute('href');
+            if (!href) {
+                continue;
+            }
+            const destino = document.getElementById(href.slice(1));
+            if (destino) {
+                pares.push({ enlace, seccion: destino });
+            }
+        }
+        if (pares.length === 0 || !('IntersectionObserver' in window)) {
             return;
         }
-
-        var observador = new IntersectionObserver(function (entradas) {
-            entradas.forEach(function (entrada) {
+        const observador = new IntersectionObserver((entradas) => {
+            for (const entrada of entradas) {
                 if (!entrada.isIntersecting) {
-                    return;
+                    continue;
                 }
-                pares.forEach(function (par) {
+                for (const par of pares) {
                     par.enlace.classList.toggle('activo', par.seccion === entrada.target);
-                });
-            });
+                }
+            }
         }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
-
-        pares.forEach(function (par) { observador.observe(par.seccion); });
-
+        for (const par of pares) {
+            observador.observe(par.seccion);
+        }
         /* Estado inicial: resalta el primer enlace hasta que el scroll lo actualice. */
-        var hayActivo = pares.some(function (par) {
-            return par.enlace.classList.contains('activo');
-        });
+        const hayActivo = pares.some((par) => par.enlace.classList.contains('activo'));
         if (!hayActivo) {
-            pares[0].enlace.classList.add('activo');
+            const primero = pares[0];
+            if (primero) {
+                primero.enlace.classList.add('activo');
+            }
         }
     }
-
     /* ============================================================
        2. Aparición suave de tarjetas y secciones
        ============================================================ */
@@ -91,154 +97,139 @@
         if (reducirMovimiento || !('IntersectionObserver' in window)) {
             return;
         }
-
-        var elementos = $$('.plato, #inicio img, #menu h3, .tarjeta-contacto, .formulario-contacto');
-        if (!elementos.length) {
+        const elementos = $$('.plato, #inicio img, #menu h3, .tarjeta-contacto, .formulario-contacto');
+        if (elementos.length === 0) {
             return;
         }
-
-        elementos.forEach(function (el) { el.classList.add('revelar'); });
-
-        var observador = new IntersectionObserver(function (entradas, obs) {
-            entradas.forEach(function (entrada) {
+        for (const elemento of elementos) {
+            elemento.classList.add('revelar');
+        }
+        const observador = new IntersectionObserver((entradas, obs) => {
+            for (const entrada of entradas) {
                 if (!entrada.isIntersecting) {
-                    return;
+                    continue;
                 }
                 entrada.target.classList.add('visible');
                 obs.unobserve(entrada.target);
-            });
+            }
         }, { threshold: 0.12 });
-
-        elementos.forEach(function (el) { observador.observe(el); });
+        for (const elemento of elementos) {
+            observador.observe(elemento);
+        }
     }
-
     /* ============================================================
        3. Botón "volver arriba"
        ============================================================ */
     function iniciarBotonArriba() {
-        var boton = $('#volver-arriba');
-        if (!boton) {
+        const botonEncontrado = $('#volver-arriba');
+        if (!botonEncontrado) {
             return;
         }
-
-        var temporizador = null;
-
+        /* Copia no nula: el narrowing no se conserva dentro de una función
+           declarada, así que se fija el tipo antes de crear los callbacks. */
+        const boton = botonEncontrado;
+        let temporizador = null;
         function actualizar() {
             if (window.scrollY > 500) {
-                window.clearTimeout(temporizador);
+                if (temporizador !== null) {
+                    window.clearTimeout(temporizador);
+                    temporizador = null;
+                }
                 boton.hidden = false;
-                window.requestAnimationFrame(function () {
+                window.requestAnimationFrame(() => {
                     boton.classList.add('visible');
                 });
-            } else {
+            }
+            else {
                 boton.classList.remove('visible');
-                temporizador = window.setTimeout(function () {
+                temporizador = window.setTimeout(() => {
                     boton.hidden = true;
                 }, 300);
             }
         }
-
         window.addEventListener('scroll', actualizar, { passive: true });
-
-        boton.addEventListener('click', function () {
+        boton.addEventListener('click', () => {
             window.scrollTo({
                 top: 0,
                 behavior: reducirMovimiento ? 'auto' : 'smooth'
             });
         });
-
         actualizar();
     }
-
-    /* ============================================================
-       4. Formulario de contacto (envía a WhatsApp)
-       ============================================================ */
     function iniciarFormulario() {
-        var formulario = $('#formulario-contacto');
+        const formulario = $('#formulario-contacto');
         if (!formulario) {
             return;
         }
-
-        var campoNombre = $('#nombre', formulario);
-        var campoMensaje = $('#mensaje', formulario);
-        var campoEmpresa = $('#empresa', formulario);
-        var boton = $('.boton-enviar', formulario);
-        var salida = $('#form-mensaje', formulario);
-        var textoBoton = boton ? boton.textContent : 'Enviar por WhatsApp';
-        var intervaloEspera = null;
-
-        function mostrarMensaje(texto, tipo) {
+        const campoNombre = $('#nombre', formulario);
+        const campoMensaje = $('#mensaje', formulario);
+        const campoEmpresa = $('#empresa', formulario);
+        const boton = $('.boton-enviar', formulario);
+        const salida = $('#form-mensaje', formulario);
+        const textoBoton = boton?.textContent ?? 'Enviar por WhatsApp';
+        let intervaloEspera = null;
+        function mostrarMensaje(texto, tipo = 'info') {
             if (!salida) {
                 return;
             }
             salida.textContent = texto;
-            salida.dataset.tipo = tipo || 'info';
+            salida.dataset.tipo = tipo;
         }
-
         function leerEnvios() {
             try {
-                var datos = JSON.parse(almacen.get(CLAVE_ENVIOS) || '[]');
+                const datos = JSON.parse(almacen.get(CLAVE_ENVIOS) ?? '[]');
                 if (!Array.isArray(datos)) {
                     return [];
                 }
-                return datos.filter(function (marca) {
-                    return typeof marca === 'number' && marca > 0;
-                });
-            } catch (e) {
+                return datos.filter((marca) => (typeof marca === 'number' && marca > 0));
+            }
+            catch {
                 return [];
             }
         }
-
         function guardarEnvios(lista) {
             almacen.set(CLAVE_ENVIOS, JSON.stringify(lista));
         }
-
         function estadoLimite() {
-            var ahora = Date.now();
-            var envios = leerEnvios().filter(function (marca) {
-                return ahora - marca < VENTANA_MS;
-            });
-
+            const ahora = Date.now();
+            const envios = leerEnvios().filter((marca) => ahora - marca < VENTANA_MS);
             if (envios.length >= MAX_ENVIOS) {
-                var esperaMax = Math.ceil((VENTANA_MS - (ahora - envios[0])) / 1000);
+                const esperaMax = Math.ceil((VENTANA_MS - (ahora - envios[0])) / 1000);
                 return { bloqueado: true, espera: esperaMax, motivo: 'maximo' };
             }
-
-            var ultimo = envios.length ? envios[envios.length - 1] : 0;
-            var restante = INTERVALO_MS - (ahora - ultimo);
+            const ultimo = envios.length ? envios[envios.length - 1] : 0;
+            const restante = INTERVALO_MS - (ahora - ultimo);
             if (restante > 0) {
                 return { bloqueado: true, espera: Math.ceil(restante / 1000), motivo: 'intervalo' };
             }
-
             return { bloqueado: false, espera: 0, motivo: '' };
         }
-
         function iniciarEspera(segundos) {
             if (!boton) {
                 return;
             }
-
-            if (intervaloEspera) {
+            if (intervaloEspera !== null) {
                 window.clearInterval(intervaloEspera);
+                intervaloEspera = null;
             }
-
-            var restantes = Math.max(1, Math.ceil(segundos));
+            let restantes = Math.max(1, Math.ceil(segundos));
             boton.disabled = true;
-            boton.textContent = 'Espera ' + restantes + ' s…';
-
-            intervaloEspera = window.setInterval(function () {
+            boton.textContent = `Espera ${restantes} s…`;
+            intervaloEspera = window.setInterval(() => {
                 restantes -= 1;
                 if (restantes <= 0) {
-                    window.clearInterval(intervaloEspera);
-                    intervaloEspera = null;
+                    if (intervaloEspera !== null) {
+                        window.clearInterval(intervaloEspera);
+                        intervaloEspera = null;
+                    }
                     boton.disabled = false;
                     boton.textContent = textoBoton;
-                } else {
-                    boton.textContent = 'Espera ' + restantes + ' s…';
+                }
+                else {
+                    boton.textContent = `Espera ${restantes} s…`;
                 }
             }, 1000);
         }
-
         function marcarError(campo, mensaje) {
             mostrarMensaje(mensaje, 'error');
             if (campo) {
@@ -246,81 +237,367 @@
                 campo.focus();
             }
         }
-
-        [campoNombre, campoMensaje].forEach(function (campo) {
+        for (const campo of [campoNombre, campoMensaje]) {
             if (!campo) {
-                return;
+                continue;
             }
-            campo.addEventListener('input', function () {
+            campo.addEventListener('input', () => {
                 campo.removeAttribute('aria-invalid');
             });
-        });
-
-        formulario.addEventListener('submit', function (evento) {
+        }
+        formulario.addEventListener('submit', (evento) => {
             evento.preventDefault();
-
             /* Trampa anti-bots: si el campo oculto tiene texto, se descarta. */
             if (campoEmpresa && campoEmpresa.value.trim() !== '') {
                 formulario.reset();
                 mostrarMensaje('No se pudo enviar el mensaje. Inténtalo de nuevo.', 'error');
                 return;
             }
-
-            var nombre = normalizar(campoNombre ? campoNombre.value : '').slice(0, LIMITE_NOMBRE);
-            var mensaje = normalizar(campoMensaje ? campoMensaje.value : '').slice(0, LIMITE_MENSAJE);
-
+            const nombre = normalizar(campoNombre ? campoNombre.value : '').slice(0, LIMITE_NOMBRE);
+            const mensaje = normalizar(campoMensaje ? campoMensaje.value : '').slice(0, LIMITE_MENSAJE);
             if (nombre.length < 2) {
                 marcarError(campoNombre, 'Escribe tu nombre (mínimo 2 caracteres).');
                 return;
             }
-
             if (mensaje.length < 10) {
                 marcarError(campoMensaje, 'Cuéntanos un poco más (mínimo 10 caracteres).');
                 return;
             }
-
-            var limite = estadoLimite();
+            const limite = estadoLimite();
             if (limite.bloqueado) {
                 if (limite.motivo === 'maximo') {
                     mostrarMensaje('Demasiados mensajes seguidos. Inténtalo más tarde.', 'error');
-                } else {
-                    mostrarMensaje('Por seguridad, espera ' + limite.espera + ' segundos antes de enviar otro mensaje.', 'error');
+                }
+                else {
+                    mostrarMensaje(`Por seguridad, espera ${limite.espera} segundos antes de enviar otro mensaje.`, 'error');
                 }
                 iniciarEspera(Math.min(limite.espera, 600));
                 return;
             }
-
             /* encodeURIComponent evita inyección de parámetros en la URL. */
-            var texto = 'Hola, soy ' + nombre + '. ' + mensaje;
-            var url = 'https://wa.me/' + WHATSAPP_NUMERO + '?text=' + encodeURIComponent(texto);
-
-            var enlace = document.createElement('a');
+            const texto = `Hola, soy ${nombre}. ${mensaje}`;
+            const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(texto)}`;
+            const enlace = document.createElement('a');
             enlace.href = url;
             enlace.target = '_blank';
             enlace.rel = 'noopener noreferrer';
             document.body.appendChild(enlace);
             enlace.click();
             enlace.remove();
-
-            var envios = leerEnvios().filter(function (marca) {
-                return Date.now() - marca < VENTANA_MS;
-            });
+            const envios = leerEnvios().filter((marca) => Date.now() - marca < VENTANA_MS);
             envios.push(Date.now());
             guardarEnvios(envios);
-
             formulario.reset();
-            campoNombre && campoNombre.removeAttribute('aria-invalid');
-            campoMensaje && campoMensaje.removeAttribute('aria-invalid');
+            campoNombre?.removeAttribute('aria-invalid');
+            campoMensaje?.removeAttribute('aria-invalid');
             mostrarMensaje('¡Listo! Se abrió WhatsApp para completar el envío.', 'ok');
             iniciarEspera(Math.ceil(INTERVALO_MS / 1000));
         });
-
-        var limiteInicial = estadoLimite();
+        const limiteInicial = estadoLimite();
         if (limiteInicial.bloqueado) {
             iniciarEspera(Math.min(limiteInicial.espera, 600));
         }
     }
-
+    const CLAVE_CARRITO = 'lsa_carrito';
+    const MAX_CANTIDAD = 20;
+    function formatearPrecio(valor) {
+        return '$CLP' + Math.round(valor).toLocaleString('es-CL');
+    }
+    function leerCarrito() {
+        try {
+            const datos = JSON.parse(almacen.get(CLAVE_CARRITO) ?? '[]');
+            if (!Array.isArray(datos)) {
+                return [];
+            }
+            const items = [];
+            for (const dato of datos) {
+                if (typeof dato !== 'object' || dato === null) {
+                    continue;
+                }
+                const registro = dato;
+                const { id, nombre, precio, cantidad } = registro;
+                if (typeof id !== 'string' || typeof nombre !== 'string') {
+                    continue;
+                }
+                if (typeof precio !== 'number' || !Number.isFinite(precio) || precio <= 0) {
+                    continue;
+                }
+                if (typeof cantidad !== 'number' || !Number.isInteger(cantidad) || cantidad <= 0) {
+                    continue;
+                }
+                items.push({
+                    id,
+                    nombre,
+                    precio,
+                    cantidad: Math.min(cantidad, MAX_CANTIDAD)
+                });
+            }
+            return items;
+        }
+        catch {
+            return [];
+        }
+    }
+    function guardarCarrito(items) {
+        almacen.set(CLAVE_CARRITO, JSON.stringify(items));
+    }
+    function iniciarCarrito() {
+        const panel = $('#carrito-panel');
+        const overlay = $('#carrito-overlay');
+        const disparador = $('#abrir-carrito');
+        const contenedor = $('#carrito-items');
+        const salidaTotal = $('#carrito-total');
+        const salidaContador = $('#carrito-contador');
+        const botonCheckout = $('#carrito-checkout');
+        const botonVaciar = $('#carrito-vaciar');
+        const salidaMensaje = $('#carrito-mensaje');
+        const aviso = $('#carrito-aviso');
+        if (!panel || !overlay || !contenedor || !salidaTotal || !salidaContador) {
+            return;
+        }
+        const panelEl = panel;
+        const overlayEl = overlay;
+        const contenedorEl = contenedor;
+        const totalEl = salidaTotal;
+        const contadorEl = salidaContador;
+        function anunciar(texto) {
+            if (aviso) {
+                aviso.textContent = texto;
+            }
+        }
+        function mostrarMensaje(texto, tipo) {
+            if (!salidaMensaje) {
+                return;
+            }
+            salidaMensaje.textContent = texto;
+            salidaMensaje.dataset.tipo = tipo;
+        }
+        function crearBotonCantidad(texto, accion, id, etiqueta) {
+            const boton = document.createElement('button');
+            boton.type = 'button';
+            boton.className = 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cream text-base leading-none text-ink transition hover:bg-cream';
+            boton.textContent = texto;
+            boton.dataset.accion = accion;
+            boton.dataset.id = id;
+            boton.setAttribute('aria-label', etiqueta);
+            return boton;
+        }
+        function crearFila(item) {
+            const fila = document.createElement('div');
+            fila.className = 'flex items-start gap-3 border-b border-cream py-4 last:border-b-0';
+            const info = document.createElement('div');
+            info.className = 'min-w-0 flex-1';
+            const nombre = document.createElement('p');
+            nombre.className = 'm-0 font-semibold text-ink';
+            nombre.textContent = item.nombre;
+            const unitario = document.createElement('p');
+            unitario.className = 'm-0 text-sm text-ink/70';
+            unitario.textContent = formatearPrecio(item.precio) + ' c/u';
+            const subtotal = document.createElement('p');
+            subtotal.className = 'm-0 mt-1 text-sm font-bold text-brand';
+            subtotal.textContent = formatearPrecio(item.precio * item.cantidad);
+            info.append(nombre, unitario, subtotal);
+            const cantidad = document.createElement('span');
+            cantidad.className = 'min-w-6 text-center text-sm font-bold text-ink';
+            cantidad.textContent = String(item.cantidad);
+            const controles = document.createElement('div');
+            controles.className = 'flex items-center gap-1';
+            controles.append(crearBotonCantidad('−', 'restar', item.id, 'Quitar una unidad'), cantidad, crearBotonCantidad('+', 'sumar', item.id, 'Agregar una unidad'), crearBotonCantidad('×', 'quitar', item.id, 'Eliminar del pedido'));
+            fila.append(info, controles);
+            return fila;
+        }
+        function render() {
+            const items = leerCarrito();
+            contenedorEl.replaceChildren();
+            if (items.length === 0) {
+                const vacio = document.createElement('p');
+                vacio.className = 'm-0 py-12 text-center text-sm text-ink/70';
+                vacio.textContent = 'Tu pedido está vacío. Agregá platos desde el menú.';
+                contenedorEl.appendChild(vacio);
+            }
+            else {
+                for (const item of items) {
+                    contenedorEl.appendChild(crearFila(item));
+                }
+            }
+            const total = items.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+            const unidades = items.reduce((suma, item) => suma + item.cantidad, 0);
+            totalEl.textContent = formatearPrecio(total);
+            contadorEl.textContent = String(unidades);
+            contadorEl.hidden = unidades === 0;
+            if (botonCheckout) {
+                botonCheckout.disabled = items.length === 0;
+            }
+            if (botonVaciar) {
+                botonVaciar.disabled = items.length === 0;
+            }
+        }
+        function abrirPanel() {
+            panelEl.classList.remove('hidden');
+            panelEl.classList.add('flex');
+            panelEl.setAttribute('aria-hidden', 'false');
+            overlayEl.classList.remove('hidden');
+            document.body.classList.add('carrito-abierto');
+            if (disparador) {
+                disparador.setAttribute('aria-expanded', 'true');
+            }
+            const cerrar = panelEl.querySelector('[data-cerrar-carrito]');
+            cerrar?.focus();
+        }
+        function cerrarPanel() {
+            panelEl.classList.add('hidden');
+            panelEl.classList.remove('flex');
+            panelEl.setAttribute('aria-hidden', 'true');
+            overlayEl.classList.add('hidden');
+            document.body.classList.remove('carrito-abierto');
+            if (disparador) {
+                disparador.setAttribute('aria-expanded', 'false');
+                disparador.focus();
+            }
+        }
+        function agregar(id, nombre, precio) {
+            const items = leerCarrito();
+            const existente = items.find((item) => item.id === id);
+            if (existente) {
+                existente.cantidad = Math.min(existente.cantidad + 1, MAX_CANTIDAD);
+            }
+            else {
+                items.push({ id, nombre, precio, cantidad: 1 });
+            }
+            guardarCarrito(items);
+            render();
+            anunciar(`${nombre} agregado al pedido.`);
+        }
+        function cambiarCantidad(id, accion) {
+            const items = leerCarrito();
+            const indice = items.findIndex((item) => item.id === id);
+            const item = items[indice];
+            if (!item) {
+                return;
+            }
+            if (accion === 'sumar') {
+                item.cantidad = Math.min(item.cantidad + 1, MAX_CANTIDAD);
+            }
+            else if (accion === 'restar') {
+                item.cantidad -= 1;
+            }
+            else if (accion === 'quitar') {
+                item.cantidad = 0;
+            }
+            if (item.cantidad <= 0) {
+                items.splice(indice, 1);
+            }
+            guardarCarrito(items);
+            render();
+        }
+        disparador?.addEventListener('click', abrirPanel);
+        overlayEl.addEventListener('click', cerrarPanel);
+        document.addEventListener('click', (evento) => {
+            const objetivo = evento.target;
+            if (!(objetivo instanceof Element)) {
+                return;
+            }
+            if (objetivo.closest('[data-cerrar-carrito]')) {
+                cerrarPanel();
+                return;
+            }
+            const botonAgregar = objetivo.closest('[data-agregar]');
+            if (!botonAgregar) {
+                return;
+            }
+            const plato = botonAgregar.closest('.plato');
+            if (!plato) {
+                return;
+            }
+            const id = plato.dataset.id;
+            const nombre = plato.dataset.nombre;
+            const precio = Number(plato.dataset.precio);
+            if (!id || !nombre || !Number.isFinite(precio) || precio <= 0) {
+                return;
+            }
+            agregar(id, nombre, precio);
+        });
+        contenedorEl.addEventListener('click', (evento) => {
+            const objetivo = evento.target;
+            if (!(objetivo instanceof Element)) {
+                return;
+            }
+            const boton = objetivo.closest('[data-accion]');
+            if (!boton) {
+                return;
+            }
+            const id = boton.dataset.id;
+            const accion = boton.dataset.accion;
+            if (!id || !accion) {
+                return;
+            }
+            cambiarCantidad(id, accion);
+        });
+        document.addEventListener('keydown', (evento) => {
+            if (evento.key === 'Escape' && !panelEl.classList.contains('hidden')) {
+                cerrarPanel();
+            }
+        });
+        botonCheckout?.addEventListener('click', () => {
+            const items = leerCarrito();
+            if (items.length === 0) {
+                return;
+            }
+            const sesion = window.LSAuth ? window.LSAuth.leer() : null;
+            const nombre = sesion ? sesion.usuario : 'Cliente';
+            const lineas = items.map((item) => (`${item.cantidad}x ${item.nombre} — ${formatearPrecio(item.precio * item.cantidad)}`));
+            const total = items.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+            const texto = `Hola, soy ${nombre}. Quiero hacer este pedido:\n${lineas.join('\n')}\nTotal: ${formatearPrecio(total)}`;
+            const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(texto)}`;
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.target = '_blank';
+            enlace.rel = 'noopener noreferrer';
+            document.body.appendChild(enlace);
+            enlace.click();
+            enlace.remove();
+            mostrarMensaje('Se abrió WhatsApp con tu pedido.', 'ok');
+        });
+        botonVaciar?.addEventListener('click', () => {
+            guardarCarrito([]);
+            render();
+            mostrarMensaje('Pedido vaciado.', 'info');
+        });
+        render();
+    }
+    /* ============================================================
+       6. Estado de sesión en el header (demo local)
+       ============================================================ */
+    function iniciarSesionUI() {
+        const zona = $('#zona-sesion');
+        if (!zona || !window.LSAuth) {
+            return;
+        }
+        const zonaEl = zona;
+        function renderSesion() {
+            zonaEl.replaceChildren();
+            const sesion = window.LSAuth.leer();
+            if (!sesion) {
+                const enlace = document.createElement('a');
+                enlace.href = 'login.html';
+                enlace.textContent = 'Ingresar';
+                zonaEl.appendChild(enlace);
+                return;
+            }
+            const saludo = document.createElement('span');
+            saludo.className = 'nav-greeting';
+            saludo.textContent = `Hola, ${sesion.usuario}`;
+            const salir = document.createElement('button');
+            salir.type = 'button';
+            salir.textContent = 'Salir';
+            salir.addEventListener('click', () => {
+                window.LSAuth.cerrar();
+                renderSesion();
+            });
+            zonaEl.append(saludo, salir);
+        }
+        renderSesion();
+    }
     /* ============================================================
        Arranque
        ============================================================ */
@@ -328,14 +605,15 @@
     iniciarRevelado();
     iniciarBotonArriba();
     iniciarFormulario();
-
+    iniciarCarrito();
+    iniciarSesionUI();
     /* ============================================================
        PWA: registro del service worker
        (los navegadores solo lo permiten en http/https, no en file://)
        ============================================================ */
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-            navigator.serviceWorker.register('sw.js').catch(function () {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(() => {
                 /* Sin service worker el sitio sigue funcionando con normalidad. */
             });
         });

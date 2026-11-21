@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ============ SEGURIDAD ============ -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- ============ SEO / METADATOS ============ -->
+    <meta name="description" content="Inicio de sesión de demostración de Las Sazones de Anita.">
+    <meta name="theme-color" content="#b5542d">
+    <meta name="robots" content="noindex">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link href="css/tailwind.css" rel="stylesheet">
+    <script src="js/auth.js" defer></script>
+    <script src="js/login.js" defer></script>
+    <title>Ingresar | Las Sazones de Anita</title>
+</head>
+
+<body>
+    <main class="flex min-h-screen items-center justify-center px-4 py-12">
+        <section class="w-full max-w-md">
+            <div class="mb-6 text-center">
+                <a href="index.html" class="text-sm font-semibold text-brand no-underline hover:underline">&larr; Volver
+                    al restaurante</a>
+                <h1 class="mt-3 text-3xl font-bold text-brand">Las Sazones de Anita</h1>
+                <p class="mt-2 text-sm text-ink/80">Ingresá para asociar tu nombre al pedido.</p>
+            </div>
+
+            
+                <form id="form-login" class="space-y-4" novalidate>
+                    <div>
+                        <label for="usuario" class="mb-1.5 block text-sm font-semibold text-ink">Usuario</label>
+                        <input type="text" id="usuario" name="usuario" autocomplete="username" maxlength="40" required
+                            class="w-full rounded-xl border border-cream bg-white px-4 py-2.5 text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30">
+                    </div>
+
+                    <div>
+                        <label for="clave" class="mb-1.5 block text-sm font-semibold text-ink">Contraseña</label>
+                        <input type="password" id="clave" name="clave" autocomplete="current-password" maxlength="72"
+                            required
+                            class="w-full rounded-xl border border-cream bg-white px-4 py-2.5 text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30">
+                    </div>
+
+                    <button type="submit"
+                        class="w-full rounded-full bg-brand px-4 py-3 text-sm font-bold text-white transition hover:bg-brand-dark">
+                        Ingresar
+                    </button>
+
+                    <p id="login-mensaje" role="status" aria-live="polite"
+                        class="min-h-5 text-center text-sm font-semibold text-brand data-[tipo=ok]:text-olive"></p>
+                </form>
+
+                <div id="sesion-activa" class="hidden text-center">
+                    <p class="text-sm text-ink/80">Sesión iniciada como</p>
+                    <p id="sesion-nombre" class="mt-1 text-lg font-bold text-brand"></p>
+                    <div class="mt-5 flex flex-col gap-2">
+                        <a href="index.html"
+                            class="rounded-full bg-brand px-4 py-3 text-sm font-bold text-white no-underline transition hover:bg-brand-dark">Ir
+                            al menú</a>
+                        <button type="button" id="cerrar-sesion"
+                            class="rounded-full border border-cream px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-cream">
+                            Cerrar sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <p class="mt-6 text-center text-xs text-ink/60">Las Sazones de Anita &middot; 2026</p>
+        </section>
+    </main>
+</body>
+
+</html>

@@ -11,13 +11,16 @@
  */
 'use strict';
 
-var CACHE_NAME = 'lsa-v3';
+var CACHE_NAME = 'lsa-v5';
 
 var CORE_ASSETS = [
     './',
     './index.html',
-    './css/style.css',
+    './login.html',
+    './css/tailwind.css',
+    './js/auth.js',
     './js/main.js',
+    './js/login.js',
     './manifest.json',
     './icons/icon-192.png',
     './icons/icon-512.png',
